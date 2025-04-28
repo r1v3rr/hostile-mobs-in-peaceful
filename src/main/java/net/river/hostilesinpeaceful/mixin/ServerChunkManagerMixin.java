@@ -1,29 +1,45 @@
 package net.river.hostilesinpeaceful.mixin;
 
 import net.minecraft.server.world.ServerChunkManager;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.WorldProperties; // Import WorldProperties
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ServerChunkManager.class) // 1. Target the ServerChunkManager class
+// Import your logger to see if the redirect happens
+import net.river.hostilesinpeaceful.HostilesInPeaceful;
+
+@Mixin(ServerChunkManager.class)
 public abstract class ServerChunkManagerMixin {
 
-    // 2. Use @ModifyArg to change an argument passed to another method
-    @ModifyArg(
-            method = "tickChunks", // 3. Inside the 'tickChunks' method...
-            // 4. Find the specific call to 'NaturalSpawner.spawnForChunk'
+    // Redirect calls to getDifficulty() made from within tickChunks.
+    // When the spawning logic checks the difficulty, we'll make it seem non-peaceful.
+    @Redirect(
+            method = "tickChunks", // Target the main chunk ticking method
             at = @At(
-                    value = "INVOKE", // 5. Look for a method call instruction
-                    // 6. The exact method signature we're looking for
-                    target = "Lnet/minecraft/world/spawner/NaturalSpawner;spawnForChunk(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/WorldChunk;Lnet/minecraft/world/spawner/NaturalSpawner$Info;ZZZ)V"
-            ),
-            // 7. Specify which argument number to change (0-based index)
-            //    The 'spawnMonsters' boolean is the 5th argument, so index 4.
-            index = 4
+                    value = "INVOKE",
+                    // Find calls to the world's getDifficulty method
+                    // Updated target: Check WorldProperties instead of ServerWorld directly, as ServerWorld delegates
+                    target = "Lnet/minecraft/world/WorldProperties;getDifficulty()Lnet/minecraft/world/Difficulty;"
+                    // We add remap = false because getDifficulty might be an interface method
+                    // that doesn't get remapped by Yarn in the same way. Try with and without if it fails.
+                    // remap = false // Let's try without first, add if needed.
+            )
     )
-    // 8. This method receives the original value and returns the new value
-    private boolean hostilesinpeaceful_alwaysSpawnMonsters(boolean originalSpawnMonsters) {
-        // 9. We ignore the original value and always return 'true'
-        return true;
+    private Difficulty hostilesinpeaceful_pretendNotPeacefulForSpawning(WorldProperties worldProperties) {
+        Difficulty actualDifficulty = worldProperties.getDifficulty(); // Get the real difficulty from the properties
+
+        // If the game is actually in Peaceful...
+        if (actualDifficulty == Difficulty.PEACEFUL) {
+            // Log that we're intervening
+            HostilesInPeaceful.LOGGER.info("Redirecting getDifficulty() check during chunk ticking: Pretending it's HARD.");
+            // ...return a non-peaceful difficulty (like Hard) to allow spawning checks to proceed.
+            return Difficulty.HARD;
+        }
+
+        // Otherwise (if it's Easy, Normal, or Hard already), just return the actual difficulty.
+        return actualDifficulty;
     }
 }
