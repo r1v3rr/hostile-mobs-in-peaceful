@@ -20,16 +20,14 @@ public abstract class ServerChunkManagerMixin {
             method = "tickChunks", // Target the main chunk ticking method
             at = @At(
                     value = "INVOKE",
-                    // Find calls to the world's getDifficulty method
-                    // Updated target: Check WorldProperties instead of ServerWorld directly, as ServerWorld delegates
-                    target = "Lnet/minecraft/world/WorldProperties;getDifficulty()Lnet/minecraft/world/Difficulty;"
-                    // We add remap = false because getDifficulty might be an interface method
-                    // that doesn't get remapped by Yarn in the same way. Try with and without if it fails.
-                    // remap = false // Let's try without first, add if needed.
+                    // Find calls to the world's getDifficulty method on ServerWorld
+                    target = "Lnet/minecraft/server/world/ServerWorld;getDifficulty()Lnet/minecraft/world/Difficulty;"
+                    // We might need remap = false here if it still fails, but try without first.
+                    // remap = false
             )
     )
-    private Difficulty hostilesinpeaceful_pretendNotPeacefulForSpawning(WorldProperties worldProperties) {
-        Difficulty actualDifficulty = worldProperties.getDifficulty(); // Get the real difficulty from the properties
+    private Difficulty hostilesinpeaceful_pretendNotPeacefulForSpawning(ServerWorld serverWorld) { // Changed parameter type
+        Difficulty actualDifficulty = serverWorld.getDifficulty(); // Use the new parameter
 
         // If the game is actually in Peaceful...
         if (actualDifficulty == Difficulty.PEACEFUL) {
