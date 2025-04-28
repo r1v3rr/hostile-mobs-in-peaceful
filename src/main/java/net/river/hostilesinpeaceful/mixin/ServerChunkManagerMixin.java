@@ -1,7 +1,6 @@
 package net.river.hostilesinpeaceful.mixin;
 
 import net.minecraft.server.world.ServerChunkManager;
-import net.minecraft.world.spawner.NaturalSpawner; // Needed for the target method signature
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
