@@ -2,6 +2,7 @@ package net.river.hostilesinpeaceful.mixin;
 
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.Difficulty;
+import net.river.hostilesinpeaceful.mixin.NaturalSpawner;
 import net.minecraft.world.chunk.WorldChunk; // Import needed class
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,13 +12,13 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import net.river.hostilesinpeaceful.HostilesInPeaceful;
 
 
-@Mixin(net.river.hostilesinpeaceful.mixin.NaturalSpawner.class) // Target the NaturalSpawner class
+@Mixin(NaturalSpawner.class) // Target the NaturalSpawner class
 public abstract class NaturalSpawnerMixin {
 
     // Modify the 'spawnMonsters' parameter of the 'spawnForChunk' method.
     @ModifyVariable(
-            // The target method signature seems to be this based on common patterns and previous errors:
-            method = "spawnForChunk(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/WorldChunk;Lnet/minecraft/world/spawner/NaturalSpawner$Info;ZZZ)V",
+            // Updated signature guess for 1.21.5 - adds Random and int parameters
+            method = "spawnForChunk(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/world/chunk/WorldChunk;Lnet/minecraft/world/spawner/NaturalSpawner$Info;ZZZLnet/minecraft/util/math/random/Random;I)V",
             // Modify the variable right at the start of the method's execution
             at = @At("HEAD"),
             // This ensures we are modifying a method argument, not a local variable defined later
