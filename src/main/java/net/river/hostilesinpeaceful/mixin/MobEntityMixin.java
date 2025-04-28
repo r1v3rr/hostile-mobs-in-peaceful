@@ -8,24 +8,23 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import net.river.hostilesinpeaceful.HostilesInPeaceful;
+
 
 @Mixin(MobEntity.class)
 public abstract class MobEntityMixin {
 
-    // Shadow the getWorld() method from the target class (Entity -> MobEntity)
-    // This gives us direct access to call it. Must be abstract if the target is.
-
-    @Inject(method = "canImmediatelyDespawn(D)Z",
-            at = @At("HEAD"),
-            cancellable = true)
-    private void hostilesinpeaceful_preventImmediateDespawn(double distanceSquared, CallbackInfoReturnable<Boolean> cir) {
-        // Now we can directly call the shadowed getWorld() method
+    @Inject(method = "isPersistent()Z", at = @At("HEAD"), cancellable = true)
+    private void hostilesinpeaceful_makePersistentInPeaceful(CallbackInfoReturnable<Boolean> cir) {
+        // Get the world instance
         World world = ((Entity)(Object)this).getWorld();
 
+        // Check if the world exists and is Peaceful
         if (world != null && world.getDifficulty() == Difficulty.PEACEFUL) {
-            // Prevent despawning in peaceful
-            cir.setReturnValue(false);
+            // If in peaceful, make the mob persistent
+            HostilesInPeaceful.LOGGER.info("MobEntityMixin: Making mob persistent in peaceful."); // Add log for confirmation
+            cir.setReturnValue(true); // Force the method to return true (persistent)
         }
-        // Otherwise, do nothing and let the original method logic run
+        // If not peaceful, don't interfere, let the original logic run.
     }
 }

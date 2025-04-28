@@ -4,7 +4,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"MobEntityMixin",
-		"ServerChunkManagerMixin"
+		"NaturalSpawnerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
