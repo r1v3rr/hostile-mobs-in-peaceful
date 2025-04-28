@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "hostilesinpeaceful",
+	"version": "${version}",
+	"name": "Hostile Mobs in Peaceful",
+	"description": "Spawns hostile mobs in peaceful mode! Enjoy your precious mob drops.",
+	"authors": [
+		"river!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/r1v3rr/hostiles-in-peaceful"
+	},
+	"license": "MIT",
+	"icon": "assets/hostilesinpeaceful/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.river.hostilesinpeaceful.HostilesInPeaceful"
+		],
+		"fabric-datagen": [
+			"net.river.hostilesinpeaceful.HostilesInPeacefulDataGenerator"
+		],
+		"client": [
+			"net.river.hostilesinpeaceful.HostilesInPeacefulClient"
+		]
+	},
+	"mixins": [
+		"hostilesinpeaceful.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
